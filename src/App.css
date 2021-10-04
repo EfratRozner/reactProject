@@ -1,3 +1,6 @@
+body{
+  text-align: center;
+}
 .App {
   text-align: center;
 }
@@ -71,4 +74,34 @@
 }
 #hiddenm{
   display: none;
+}
+
+
+
+/* ------homePageContent----------------- */
+
+
+
+
+.homePageContentImage{
+  background-image: url("./shutterstock_1247883289\ \(1\).jpg");
+  background-repeat: repeat;
+  background-color: #cccccc;
+  height: 600px;
+}
+.h1pink{
+  color: #e2013b;
+  font-weight: 700;
+  font-size: 45px;
+}
+
+.h1blue{
+    color: #2F5175;
+    font-size: 45px;
+    font-weight: 700;
+}
+.h2blue{
+  color: #2F5175;
+  font-size: 35px;
+  font-weight: 400;
 }
