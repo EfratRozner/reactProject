@@ -1,50 +1,116 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import Manager from './manager';
+import Customer from './customer';
+import { BrowserRouter as Router, Switch, Route, Link, withRouter, useHistory } from "react-router-dom";
+import { stat } from "fs";
+import { any } from "prop-types";
+import axios from "axios";
+import createHistory from 'history/createBrowserHistory';
+import SignIn from "./signIn";
+import OrderHistory from './orderHistory';
+import Pay from './pay';
+import Delivery from './delivery';
+import PackageDetails from './packageDetails';
 
-export default class Login extends Component {
+const state = {
+    name: "",
+    last: "",
+    mail: "",
+    pass: 123
+};
 
+function Login() {
 
-  
-    // const onSubmit=()=>{
+    const history = useHistory();
 
-    // }
-    render() {
-        return (
-            <div>
-                {/* <div className="divform">
-                 <h1>ברוכים הבאים</h1>
-                <h3>התחברו לפורטל המשלוחים של take it easy ותוכלו לנהל את המשלוחים שלכם בקלום ובמהירות</h3>
-                </div> */}
-            <form>
-                <h3>Sign In</h3>
+    const [customer, setCustomer] = useState([]);
+    let bool: number = 0;
+    let [ok, setOk] = useState(false);
+    const [show, setShow] = useState(false);
+    const [id, setId] = useState("");
+    const [name, setName] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [mail, setMail] = useState("");
+    const [pass, setPass] = useState("");
+    const [user, setUser] = useState("");
 
-                <div className="form-group">
-                    <label>Email address</label>
-                    <input type="email" className="form-control" placeholder="Enter email" />
-                </div>
+    const OK = (event: any) => {
+        event.preventDefault();
+        setOk(true);
+    };
 
-                <div className="form-group">
-                    <label>Password</label>
-                    <input type="password" className="form-control" placeholder="Enter password" />
-                </div>
-
-                <div className="form-group">
-                    <div className="custom-control custom-checkbox">
-                        <input type="checkbox" className="custom-control-input" id="customCheck1" />
-                        <label className="custom-control-label" htmlFor="customCheck1">Remember me</label>
-                    </div>
-                </div>
-
-                <button type="submit" className="btn btn-primary btn-block">Submit</button>
-                <p className="forgot-password text-right">
-                    {/* Forgot <a href="#">password?</a> */}
-                </p>
-   
-            </form>
-    
-           
-            </div>
-            
-       
-        );
+    const SetTypeOfUser = (d: string) => {
+        
+        setUser(d);
+        history.push('/Customer')
     }
+
+    const handleSubmit1 = (event: any) => {
+        event.preventDefault();
+        let customer = {
+            "customerId": id,
+            "customerName": name,
+            "address": address,
+            "phone": phone,
+            "email": mail,
+            "password": pass
+        };
+        axios.put("https://localhost:44378/api/customer/AddCustomer", customer)
+            .then((d: any) => {
+                console.log(d.data)
+            })
+    }
+
+
+    const handleSubmit = (event: any) => {
+        event.preventDefault();
+        alert(`The name you entered was: ${mail}`)
+
+        axios.get(`https://localhost:44378/api/manager/logIn/${mail}/${pass}`)
+            .then((d: any) => {
+                console.log(d.data)
+                if (d.data == "manager") {
+                    SetTypeOfUser(d.data);
+                    history.push('/Manager')
+                }
+
+            })
+        axios.get(`https://localhost:44378/api/messenger/logIn/${mail}/${pass}`)
+            .then((d: any) => {
+                console.log(d.data)
+                if (d.data == "messenger") {
+                    SetTypeOfUser(d.data);
+                    history.push('/Messenger')
+                }
+            })
+        axios.get(`https://localhost:44378/api/customer/logIn/${mail}/${pass}`)
+            .then((d: any) => {
+                console.log(d.data)
+                if (d.data == "customer") {
+                    SetTypeOfUser(d.data);
+                    setOk(false);
+                    
+                    history.push('/Customer')
+                    history.go(0);
+                }
+            })
+    }
+
+    return (
+        <div >
+            <Router >
+
+                <Switch>
+                    <Route exact path="/" render={() => <SignIn SetTypeOfUser={SetTypeOfUser} />} /> 
+                    <Route exact path="/Login" render={() => <SignIn SetTypeOfUser={SetTypeOfUser} />} /> 
+                    <Route exact path="/Manager" component={Manager} />
+                    <Route path="/Customer" component={Customer} />
+                </Switch>
+            </Router>
+        </div>
+    );
 }
+
+
+export default Login;
